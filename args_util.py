@@ -4,6 +4,10 @@ import torch
 import os
 
 def get_args():
+    """
+    获取参数
+    :return: 模型参数
+    """
     parser = argparse.ArgumentParser(description='CNN text classificer')
     # learning
     parser.add_argument('-file-path', type=str, default='./data/',

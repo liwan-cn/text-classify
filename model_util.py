@@ -12,11 +12,11 @@ def train(train_iter, test_iter, model, args):
     :param test_iter: 测试集
     :param model: 模型
     :param args: 模型参数，学习率，epoch，正则化系数，多少步输出训练过程，多少步测试一次，多少步保存一次模型等
-    :return:
+    :return: None
     """
     if args.cuda:
         model.cuda()
-    #print(args.cuda)
+    # print(args.cuda)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     step, best_acc, last_step = 0, 0, 0
@@ -61,10 +61,10 @@ def train(train_iter, test_iter, model, args):
 def eval(data_iter, model, args):
     """
     测试模型
-    :param data_iter:测试集
-    :param model:模型
-    :param args:模型参数
-    :return:返回准确率
+    :param data_iter: 测试集
+    :param model: 模型
+    :param args: 模型参数
+    :return: 返回准确率
     """
     model.eval()
     corrects, avg_loss = 0, 0
@@ -90,12 +90,12 @@ def eval(data_iter, model, args):
 def predict(text, model, word2id, id2label, cuda_flag):
     """
     预测一个分好词的文本时什么类别
-    :param text:分好词的文本词语的列表
-    :param model:训练好的模型
-    :param word2id:词语到id的映射
-    :param id2label:id到类别的映射
-    :param cuda_flag:是否适用GPU
-    :return:文本的类别
+    :param text: 分好词的文本词语的列表
+    :param model: 训练好的模型
+    :param word2id: 词语到id的映射
+    :param id2label: id到类别的映射
+    :param cuda_flag: 是否适用GPU
+    :return: 文本的类别
     """
     model.eval()
     x = Variable(torch.LongTensor([[word2id[word]
@@ -113,11 +113,11 @@ def predict(text, model, word2id, id2label, cuda_flag):
 def save(model, save_dir, save_prefix, steps):
     """
     保存模型
-    :param model:模型
-    :param save_dir:路径
-    :param save_prefix:模型文件名前缀
-    :param steps:训练的步数
-    :return:None
+    :param model: 模型
+    :param save_dir: 路径
+    :param save_prefix: 模型文件名前缀
+    :param steps: 训练的步数
+    :return: None
     """
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)

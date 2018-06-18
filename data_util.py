@@ -139,8 +139,8 @@ class TextData(data.Dataset):
     def __init__(self, file2label, word2id, transform=textfile2idlist,max_len=-1):
         """
         构造函数
-        :param file2label:文件名到标签的映射
-        :param word2id:词语到id的映射
+        :param file2label: 文件名到标签的映射
+        :param word2id: 词语到id的映射
         :param transform: 每条数据的转换操作函数
         :param max_len: 指定截断最大长度
         """
@@ -153,8 +153,8 @@ class TextData(data.Dataset):
     def __getitem__(self, index):
         """
         根据index获取一条训练数据
-        :param index:数据的下标
-        :return:一条数据的特征及标签
+        :param index: 数据的下标
+        :return: 一条数据的特征及标签
         """
         file_name, label = self.file2label[index]
         idlist = self.transform(file_name, self.word2id, self.max_len)
@@ -164,7 +164,7 @@ class TextData(data.Dataset):
     def __len__(self):
         """
         获取数据条数
-        :return:数据条数
+        :return: 数据条数
         """
         return self.len
 
