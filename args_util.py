@@ -67,6 +67,11 @@ def get_args():
     return args
 
 def print_parameters(args):
+    """
+    print model parameters
+    :param args: model parameters
+    :return: None
+    """
     print("\nParameters:")
     for attr, value in sorted(args.__dict__.items()):
         print("\t{}={}".format(attr.upper(), value))
