@@ -18,12 +18,7 @@ def process_data(path):
              file2lable: 文件名到类别的映射
              max_len:文本的最大长度
     """
-    label2id = {}
-    id2label = {}
-    word2id = {}
-    id2word = {}
-    file2lable = []
-    max_len = 0
+    label2id, id2label, word2id, id2word, file2lable, max_len = {}, {}, {}, {}, [], 0
     label_set = os.listdir(path)
     word_set = set([])
     for i, label in enumerate(label_set):
