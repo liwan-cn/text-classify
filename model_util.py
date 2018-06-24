@@ -1,9 +1,10 @@
 import os
 import sys
 import torch
+import datetime
 import torch.nn.functional as F
 from torch.autograd import Variable
-
+from tensorboardX import SummaryWriter
 
 def train(train_iter, test_iter, model, args):
     """
@@ -14,6 +15,8 @@ def train(train_iter, test_iter, model, args):
     :param args: 模型参数，学习率，epoch，正则化系数，多少步输出训练过程，多少步测试一次，多少步保存一次模型等
     :return: None
     """
+    writer = SummaryWriter(log_dir=args.log_dir)
+
     if args.cuda:
         model.cuda()
     # print(args.cuda)
@@ -37,19 +40,22 @@ def train(train_iter, test_iter, model, args):
             loss += args.l2 * l2_reg
             loss.backward()
             optimizer.step()
-
             step += 1
             if step % args.log_interval == 0:
                 corrects = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
                 accuracy = 100.0 * corrects / args.batch_size
+                writer.add_scalar('train/loss', loss, step)
+                writer.add_scalar('train/acc', accuracy, step)
                 sys.stdout.write('\rEpoch[%d] Step[%d] - loss: %f  acc: %f%% (%d/%d)'
                                  % (epoch, step, loss.data, accuracy, corrects, args.batch_size))
 
             if step % args.test_interval == 0:
-                dev_acc = eval(test_iter, model, args)
+                test_loss, test_acc = eval(test_iter, model, args)
+                writer.add_scalar('test/loss', test_loss, step)
+                writer.add_scalar('test/acc', test_acc, step)
                 model.train()#测试后把模型重置为训练模式
-                if dev_acc > best_acc:
-                    best_acc, last_step = dev_acc, step
+                if test_acc > best_acc:
+                    best_acc, last_step = test_acc, step
                     if args.save_best:
                         save(model, args.save_dir, 'best', step)
                 else:
@@ -85,7 +91,7 @@ def eval(data_iter, model, args):
     avg_loss /= size
     accuracy = 100.0 * corrects / size
     print('\nEvaluation - loss: %f  acc: %f (%d/%d)\n' % (avg_loss, accuracy, corrects, size))
-    return accuracy
+    return avg_loss, accuracy
 
 def predict(text, model, word2id, id2label, cuda_flag):
     """

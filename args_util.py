@@ -10,7 +10,7 @@ def get_args():
     """
     parser = argparse.ArgumentParser(description='CNN text classificer')
     # learning
-    parser.add_argument('-file-path', type=str, default='./data/',
+    parser.add_argument('-file-path', type=str, default='./data/new_data',
                         help='the file path')
     parser.add_argument('-lr', type=float, default=0.001,
                         help='initial learning rate [default: 0.001]')
@@ -30,6 +30,8 @@ def get_args():
                         help='how many steps to wait before saving [default:500]')
     parser.add_argument('-save-dir', type=str, default='snapshot',
                         help='where to save the snapshot')
+    parser.add_argument('-log-dir', type=str, default='logs',
+                        help='where to save the log [tensorboard]')
     parser.add_argument('-early-stop', type=int, default=1000,
                         help='iteration numbers to stop without performance increasing')
     parser.add_argument('-save-best', type=bool, default=True,
@@ -56,7 +58,7 @@ def get_args():
     parser.add_argument('-cuda', action='store_true', default=True,
                         help='disable the gpu')
     # option
-    parser.add_argument('-snapshot', type=str, default='./snapshot/2018-06-16_15-09-15/best_steps_3400.pt',
+    parser.add_argument('-snapshot', type=str, default=None,#''./snapshot/2018-06-16_15-09-15/best_steps_3400.pt',
                         help='filename of model snapshot [default: None]')
 
     parser.add_argument('-predict', type=str, default=None,#'',
@@ -67,7 +69,9 @@ def get_args():
     args = parser.parse_args()
     args.cuda = args.cuda and torch.cuda.is_available()
     args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
-    args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    now_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    args.save_dir = os.path.join(args.save_dir, now_time)
+    args.log_dir = os.path.join(args.log_dir, now_time)
     return args
 
 def print_parameters(args):
