@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-class CNN_Text(nn.Module):
+class TextCNN(nn.Module):
     def __init__(self, args):
-        super(CNN_Text, self).__init__()
+        super(TextCNN, self).__init__()
         self.args = args
 
         embed_num = args.embed_num

@@ -58,12 +58,9 @@ def get_args():
     parser.add_argument('-cuda', action='store_true', default=True,
                         help='disable the gpu')
     # option
-    parser.add_argument('-snapshot', type=str, default=None,#'./snapshot/2018-06-25_13-21-02/best_steps_1100.pt',
+    parser.add_argument('-snapshot', type=str, default=None,#'./snapshot/2018-06-25_15-51-07/best_steps_800.pt',
                         help='filename of model snapshot [default: None]')
-
-    parser.add_argument('-predict', type=str, default=None,#'',
-                        help='predict the sentence')
-    parser.add_argument('-vocab', type=str, default='./vocab/',
+    parser.add_argument('-vocab', type=str, default='./vocab/new_vocab',
                         help='vocab for predict the sentence')
 
     args = parser.parse_args()

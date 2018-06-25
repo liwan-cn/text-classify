@@ -163,12 +163,3 @@ class TextData(data.Dataset):
         :return: 数据条数
         """
         return self.len
-
-if __name__ == '__main__':
-    word2id, id2word, label2id, id2label, file2label, max_len = process_data('./data')
-    print(len(word2id))
-    print(len(id2word))
-    print(len(label2id))
-    print(len(id2label))
-    print(len(file2label))
-    print(max_len)
