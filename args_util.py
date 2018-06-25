@@ -22,8 +22,8 @@ def get_args():
                         help='batch size for training [default: 64]')
     parser.add_argument('-max-len', type=int, default=4096,
                         help='max len of sentence for training [default: 1024]')
-    parser.add_argument('-log-interval', type=int, default=1,
-                        help='how many steps to wait before logging training status [default: 1]')
+    parser.add_argument('-log-interval', type=int, default=10,
+                        help='how many steps to wait before logging training status [default: 10]')
     parser.add_argument('-test-interval', type=int, default=100,
                         help='how many steps to wait before testing [default: 100]')
     parser.add_argument('-save-interval', type=int, default=500,
@@ -58,7 +58,7 @@ def get_args():
     parser.add_argument('-cuda', action='store_true', default=True,
                         help='disable the gpu')
     # option
-    parser.add_argument('-snapshot', type=str, default=None,#''./snapshot/2018-06-16_15-09-15/best_steps_3400.pt',
+    parser.add_argument('-snapshot', type=str, default=None,#'./snapshot/2018-06-25_13-21-02/best_steps_1100.pt',
                         help='filename of model snapshot [default: None]')
 
     parser.add_argument('-predict', type=str, default=None,#'',

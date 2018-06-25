@@ -15,10 +15,11 @@ def process_data(path):
              id2word:id到词语的映射
              label2id:种类到id的映射
              id2label:id到种类的映射
-             file2lable: 文件名到类别的映射
+             file2label: 文件名到类别的映射
              max_len:文本的最大长度
     """
-    label2id, id2label, word2id, id2word, file2lable, max_len = {}, {}, {}, {}, [], 0
+    print('processing data...')
+    label2id, id2label, word2id, id2word, file2label, max_len = {}, {}, {}, {}, [], 0
     label_set = os.listdir(path)
     word_set = set([])
     for i, label in enumerate(label_set):
@@ -26,7 +27,7 @@ def process_data(path):
         id2label[i] = label
         label_path = path + '/' + label
         label_files = os.listdir(label_path)
-        file2lable += [(label_path + '/' + file_name, i) for file_name in label_files]
+        file2label += [(label_path + '/' + file_name, i) for file_name in label_files]
         for file_name in label_files:
             with open(label_path + '/' + file_name, 'r', encoding='utf-8') as f:
                 words = [word for word in f.read().split() if word != '\x00']
@@ -40,7 +41,7 @@ def process_data(path):
     for i, word in enumerate(word_set):
         word2id[word] = i+2
         id2word[i+2] = word
-    return word2id, id2word, label2id, id2label, file2lable, max_len
+    return word2id, id2word, label2id, id2label, file2label, max_len
 
 def batch_collate(batch):
     """
@@ -164,10 +165,10 @@ class TextData(data.Dataset):
         return self.len
 
 if __name__ == '__main__':
-    word2id, id2word, label2id, id2label, file2lable, max_len = process_data('./data')
+    word2id, id2word, label2id, id2label, file2label, max_len = process_data('./data')
     print(len(word2id))
     print(len(id2word))
     print(len(label2id))
     print(len(id2label))
-    print(len(file2lable))
+    print(len(file2label))
     print(max_len)

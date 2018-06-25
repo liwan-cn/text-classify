@@ -1,7 +1,6 @@
 import os
 import sys
 import torch
-import datetime
 import torch.nn.functional as F
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
@@ -23,6 +22,7 @@ def train(train_iter, test_iter, model, args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     step, best_acc, last_step = 0, 0, 0
+    train_loss, train_acc = 0., 0.
     model.train()
     for epoch in range(1, args.epochs+1):
         for feature, target in train_iter:
@@ -40,14 +40,19 @@ def train(train_iter, test_iter, model, args):
             loss += args.l2 * l2_reg
             loss.backward()
             optimizer.step()
+            corrects = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
+            accuracy = 100.0 * corrects / args.batch_size
             step += 1
+            sys.stdout.write('\rEpoch[%d] Step[%d] - loss: %f  acc: %f%% (%d/%d)'
+                             % (epoch, step, loss.data, accuracy, corrects, args.batch_size))
+            train_loss += loss.data
+            train_acc += accuracy
             if step % args.log_interval == 0:
-                corrects = (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
-                accuracy = 100.0 * corrects / args.batch_size
-                writer.add_scalar('train/loss', loss, step)
-                writer.add_scalar('train/acc', accuracy, step)
-                sys.stdout.write('\rEpoch[%d] Step[%d] - loss: %f  acc: %f%% (%d/%d)'
-                                 % (epoch, step, loss.data, accuracy, corrects, args.batch_size))
+                train_loss /= args.log_interval
+                train_acc /= args.log_interval
+                writer.add_scalar('train/loss', train_loss, step)
+                writer.add_scalar('train/acc', train_acc, step)
+                train_loss, train_acc = 0., 0.
 
             if step % args.test_interval == 0:
                 test_loss, test_acc = eval(test_iter, model, args)
@@ -58,11 +63,12 @@ def train(train_iter, test_iter, model, args):
                     best_acc, last_step = test_acc, step
                     if args.save_best:
                         save(model, args.save_dir, 'best', step)
+                        continue
                 else:
                     if step - last_step >= args.early_stop:
                         print('early stop by %d steps.'% (args.early_stop))
-            elif step % args.save_interval == 0:
-                save(model, args.save_dir, 'snapshot', step)
+            if step % args.save_interval == 0:
+                save(model, args.save_dir, 'last', step)
 
 def eval(data_iter, model, args):
     """
