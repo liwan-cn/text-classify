@@ -1,7 +1,9 @@
 import pickle
 import sys
-from tensorboardX import SummaryWriter
-from model import *
+#from TextCNN import TextCNN as Model
+from LSTM import LSTM as Model
+import torch.nn.functional as F
+from torch.autograd import Variable
 from args_util import *
 from data_util import *
 
@@ -14,22 +16,23 @@ class Trainer():
         :param args: 模型参数，学习率，epoch，正则化系数，多少步输出训练过程，多少步测试一次，多少步保存一次模型等
         """
         self.args = args
-        if self.args.snapshot is None:
+        if not self.args.dict:
             # 首次训练, 加载词典
-            self.word2id, self.id2word, self.label2id, self.id2label, self.file2label, self.max_len \
-                = process_data(self.args.file_path)
+            self.word2id, self.id2word, self.label2id, self.id2label, self.max_len \
+                = process_data(self.args.train_file)
             # 首次训练, 存储词典
             if not os.path.isdir(self.args.vocab):
                 os.makedirs(self.args.vocab)
             with open(self.args.vocab + '/' + 'word2id.pkl', 'wb') as f:
                 print('Saving word2id...')
                 pickle.dump(self.word2id, f)
+            with open(self.args.vocab + '/' + 'label2id.pkl', 'wb') as f:
+                print('Saving label2id...')
+                pickle.dump(self.label2id, f)
             with open(self.args.vocab + '/' + 'id2label.pkl', 'wb') as f:
                 print('Saving id2label...')
                 pickle.dump(self.id2label, f)
-            with open(self.args.vocab + '/' + 'file2label.pkl', 'wb') as f:
-                print('Saving file2label...')
-                pickle.dump(self.file2label, f)
+
         else:
             # 继续训练, 加载词典
             with open(self.args.vocab + '/' + 'word2id.pkl', 'rb') as f:
@@ -38,14 +41,15 @@ class Trainer():
             with open(self.args.vocab + '/' + 'id2label.pkl', 'rb') as f:
                 print('Loading id2label...')
                 self.id2label = pickle.load(f)
-            with open(self.args.vocab + '/' + 'file2label.pkl', 'rb') as f:
-                print('Loading file2label...')
-                self.file2label = pickle.load(f)
-        self.train_iter, self.test_iter = load_data(self.file2label, self.word2id, self.args)
+            with open(self.args.vocab + '/' + 'label2id.pkl', 'rb') as f:
+                print('Loading label2id...')
+                self.label2id = pickle.load(f)
+        self.train_iter, self.test_iter = load_data(self.args.train_file, self.args.test_file, self.word2id, self.label2id, self.args)
         self.args.embed_num = len(self.word2id)
         self.args.class_num = len(self.id2label)
         print_parameters(self.args)
-        self.model = TextCNN(self.args)
+        self.model = Model(self.args)
+
         if self.args.snapshot is not None:
             print('\nLoading model from %s...' % (self.args.snapshot))
             self.model.load_state_dict(torch.load(self.args.snapshot))
@@ -59,7 +63,6 @@ class Trainer():
         训练模型
         :return: None
         """
-        writer = SummaryWriter(log_dir=self.args.log_dir)
 
         if self.args.cuda:
             self.model.cuda()
@@ -95,14 +98,12 @@ class Trainer():
                 if step % self.args.log_interval == 0:
                     train_loss /= self.args.log_interval
                     train_acc /= self.args.log_interval
-                    writer.add_scalar('train/loss', train_loss, step)
-                    writer.add_scalar('train/acc', train_acc, step)
+
                     train_loss, train_acc = 0., 0.
 
                 if step % self.args.test_interval == 0:
                     test_loss, test_acc = self.eval()
-                    writer.add_scalar('test/loss', test_loss, step)
-                    writer.add_scalar('test/acc', test_acc, step)
+
                     self.model.train()#测试后把模型重置为训练模式
                     if test_acc > best_acc:
                         best_acc, last_step = test_acc, step

@@ -17,5 +17,5 @@ def predict():
             print(predictor.predict(line), end=' ')
 
 if __name__ == '__main__':
-    # train()
-    predict()
+    train()
+    #predict()

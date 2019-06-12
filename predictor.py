@@ -1,9 +1,9 @@
 import pickle
 import re
-import jieba
+from nltk.tokenize import word_tokenize
 
 from args_util import *
-from model import *
+from TextCNN import *
 
 
 class Predictor():
@@ -16,7 +16,7 @@ class Predictor():
 
         self.args = args
         self.rule = re.compile(r"[^\u4e00-\u9fa5]")
-        self.cut = jieba.cut
+        self.cut = word_tokenize
         with open(self.args.vocab + '/' + 'word2id.pkl', 'rb') as f:
             print('Loading word2id...')
             self.word2id = pickle.load(f)

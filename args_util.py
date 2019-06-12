@@ -10,8 +10,10 @@ def get_args():
     """
     parser = argparse.ArgumentParser(description='CNN text classificer')
     # learning
-    parser.add_argument('-file-path', type=str, default='./data/new_data',
-                        help='the file path')
+    parser.add_argument('-train-file', type=str, default='./data/train.csv',
+                        help='the train file path')
+    parser.add_argument('-test-file', type=str, default='./data/test.csv',
+                        help='the test file path')
     parser.add_argument('-lr', type=float, default=0.001,
                         help='initial learning rate [default: 0.001]')
     parser.add_argument('-l2', type=float, default=0.,
@@ -46,10 +48,14 @@ def get_args():
                         help='the probability for dropout [default: 0.5]')
     parser.add_argument('-embed-dim', type=int, default=128,
                         help='number of embedding dimension [default: 128]')
+
+    parser.add_argument('-hidden-dim', type=int, default=128,
+                        help='hidden dimension [default: 128]')
     parser.add_argument('-kernel-num', type=int, default=100,
                         help='number of each kind of kernel')
     parser.add_argument('-kernel-sizes', type=str, default='3,4,5',
                         help='comma-separated kernel size to use for convolution')
+
     parser.add_argument('-static', action='store_true', default=False,
                         help='fix the embedding')
     # device
@@ -60,7 +66,9 @@ def get_args():
     # option
     parser.add_argument('-snapshot', type=str, default=None,#'./snapshot/2018-06-25_15-51-07/best_steps_800.pt',
                         help='filename of model snapshot [default: None]')
-    parser.add_argument('-vocab', type=str, default='./vocab/new_vocab',
+    parser.add_argument('-dict', type=bool, default=True,  # './snapshot/2018-06-25_15-51-07/best_steps_800.pt',
+                        help='dict [default: None]')
+    parser.add_argument('-vocab', type=str, default='./vocab/',
                         help='vocab for predict the sentence')
 
     args = parser.parse_args()
