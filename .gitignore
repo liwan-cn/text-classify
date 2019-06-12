@@ -1,1 +1,4 @@
-data/
+snapshot/
+.idea/
+__pycache__/
+vocab/
